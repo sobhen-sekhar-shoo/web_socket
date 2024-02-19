@@ -12,15 +12,21 @@ app.get('/', (req, res) => {
 });
 
 io.on('connection', (socket) => {
-    console.log('a user connected');
+    let address = socket.handshake.address;
+    let id = socket.id;
+    console.log(address);
+    console.log(id);
+
+    console.log('a user connected from ' + address.address + ':' + address.port);
+
     socket.on('disconnect', () => {
         console.log('user disconnected');
     });
 
 
-    socket.on('chat message', (msg) => {
+    socket.on('sendMsg', (msg) => {
         console.log('message: ' + msg);
-        io.emit('chat message', msg);
+       io.emit("getMsg", msg);
     });
 });
 

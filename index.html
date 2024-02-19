@@ -5,23 +5,91 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Soket.io</title>
+    <style>
+        .contener {
+            border: 1px solid;
+            position: relative;
+            height: 85dvh;
+        }
+
+        .inputbox {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            display: flex;
+            gap: 5px;
+            justify-content: center;
+            margin: 10px 0;
+        }
+
+        #Input_Msg {
+            height: 25px;
+            width: 20rem;
+        }
+
+        .sender {
+            text-align: right;
+            border-bottom: 1px solid #8080804a;
+            padding: 5px 10px;
+        }
+
+        .reciver {
+            border-bottom: 1px solid #8080804a;
+            padding: 5px 10px;
+        }
+        #sendbtn{
+            height: 100%;
+        }
+    </style>
 </head>
 
 <body>
     <h3>test sokett</h3>
-    <ul id="messageBox"></ul>
+    <div class="contener">
+        <div id="MsgContent">
+            <div class="sender"><span>Hii</span></div>
+            <div class="reciver"><span>Hlo</span></div>
+        </div>
+        <div class="inputbox">
+            <form method="post">
+            <input type="text" name="MsgInput" id="Input_Msg">
+            <input type="submit" value="Send" id="sendbtn">
+        </form>
+        </div>
+    </div>
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
-        let messageBox = document.getElementById("messageBox");
+        let messageBox = document.getElementById("MsgContent");
+        let Sendbtn = document.getElementById("sendbtn");
+        let MsgBox = document.getElementById("Input_Msg");
         const socket = io();
 
-        socket.on('chat message', (msg) => {
-            const item = document.createElement('li');
-            item.textContent = msg;
-            messageBox.appendChild(item);
+        socket.on('getMsg', (msg) => {
+            const reciverHTML = document.createElement("div");
+            reciverHTML.classList.add("reciver");
+            const recSpan = document.createElement("span");
+            recSpan.innerText = msg;
+            reciverHTML.append(recSpan)
+            messageBox.appendChild(reciverHTML);
             window.scrollTo(0, document.body.scrollHeight);
         });
+
+        Sendbtn.addEventListener("click", (e) => {
+            e.preventDefault();
+            if (MsgBox.value) {
+                const SendHTML = document.createElement("div");
+                SendHTML.classList.add("sender");
+                const SendSpan = document.createElement("span");
+                SendSpan.innerText = MsgBox.value;
+                SendHTML.append(SendSpan)
+                messageBox.appendChild(SendHTML);
+                window.scrollTo(0, document.body.scrollHeight);
+
+                socket.emit('sendMsg', MsgBox.value);
+                MsgBox.value = "";
+            }
+        })
     </script>
 </body>
 
